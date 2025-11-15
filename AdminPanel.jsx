@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { db } from "./firebase";
+import React, { useState, useEffect } from "react";import { db } from "./firebase";
 import {
    collection,
    addDoc,
@@ -30,6 +29,8 @@ const PAYMENT_OPTIONS = [
    "Рассрочка",
    "парт. Ипотека",
    "7-20-25",
+   "Наурыз",
+   "Зеленая отбасы",
 ];
 
 export default function AdminPanel() {
@@ -170,7 +171,9 @@ export default function AdminPanel() {
                <input
                   placeholder="Название"
                   value={form.Название}
-                  onChange={(e) => setForm({ ...form, Название: e.target.value })}
+                  onChange={(e) =>
+                     setForm({ ...form, Название: e.target.value })
+                  }
                   style={inputStyle}
                />
 
@@ -307,9 +310,7 @@ export default function AdminPanel() {
 
                {/* CHECKBOXES */}
                <div style={{ gridColumn: "1 / 3" }}>
-                  <div style={{ marginBottom: 5, fontWeight: 600 }}>
-                     Опции:
-                  </div>
+                  <div style={{ marginBottom: 5, fontWeight: 600 }}>Опции:</div>
 
                   <label style={checkboxStyle}>
                      <input

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
    BrowserRouter,
    Routes,
@@ -103,6 +103,8 @@ const PAYMENT_OPTIONS = [
    "Рассрочка",
    "парт. Ипотека",
    "7-20-25",
+   "Наурыз",
+   "Зеленая отбасы",
 ];
 
 function useFilters(data) {
@@ -364,16 +366,22 @@ function SidebarFilters({ filters }) {
    );
 }
 
-
 function Card({ item, updateApartment }) {
    const [editing, setEditing] = useState(false);
    const [comment, setComment] = useState(item.comment || "");
 
    const borderColor = item.готов ? "border-green-500" : "border-red-500";
 
-   const handleSave = () => {
+   const handleSave = (e) => {
+      e.stopPropagation(); // чтобы не срабатывал Link
+      if (typeof updateApartment !== "function") {
+         alert("Ошибка: updateApartment не передан");
+         return;
+      }
+
       updateApartment(item.id, { comment });
       setEditing(false);
+      // alert("Комментарий сохранён ✅");
    };
 
    return (
@@ -408,7 +416,11 @@ function Card({ item, updateApartment }) {
 
          {/* Кнопка редактирования */}
          <button
-            onClick={() => setEditing(!editing)}
+            onClick={(e) => {
+               e.preventDefault(); // не перейти по Link
+               e.stopPropagation();
+               setEditing(!editing);
+            }}
             className="
                absolute top-3 right-3 
                bg-yellow-400 hover:bg-yellow-500 
@@ -453,9 +465,7 @@ function Card({ item, updateApartment }) {
    );
 }
 
-
-
-function ListPage({ data }) {
+function ListPage({ data, updateApartment }) {
    const filters = useFilters(data);
 
    return (
@@ -472,13 +482,18 @@ function ListPage({ data }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                {filters.filtered.map((item) => (
-                  <Card key={item.id} item={item} />
+                  <Card
+                     key={item.id}
+                     item={item}
+                     updateApartment={updateApartment}
+                  />
                ))}
             </div>
          </main>
       </div>
    );
 }
+
 
 function DetailPage({ data }) {
    const { id } = useParams();
@@ -561,37 +576,65 @@ function DetailPage({ data }) {
          </div>
       </div>
    );
-}
-
-// import { useApartments } from "./useApartments";
+};
 
 export default function App() {
-   const { apartments, loading } = useApartments();
+   const { apartments: fetchedApartments, loading } = useApartments();
+   const [apartments, setApartments] = useState([]);
+
+   useEffect(() => {
+      if (fetchedApartments && fetchedApartments.length) {
+         setApartments(fetchedApartments);
+      }
+   }, [fetchedApartments]);
+
+   const updateApartment = (id, updatedFields) => {
+      setApartments((prev) =>
+         prev.map((apt) => (apt.id === id ? { ...apt, ...updatedFields } : apt))
+      );
+      // alert("Объект успешно обновлён!");
+   };
 
    if (loading) return <div>Загрузка...</div>;
    if (!apartments.length) return <div>Нет объектов для отображения</div>;
 
    return (
       <BrowserRouter>
-         {/* твоя кнопка Admin */}
+         {/* кнопка Admin */}
          <Link
             to="/admin"
             className="
-               fixed bottom-6 right-6 
-               bg-blue-600 text-white 
-               px-5 py-3 
-               rounded-full shadow-xl 
-               hover:bg-blue-700 
-               transition transform hover:scale-105 
-               z-50
-            "
+           fixed bottom-6 right-6 
+           bg-blue-600 text-white 
+           px-5 py-3 
+           rounded-full shadow-xl 
+           hover:bg-blue-700 
+           transition transform hover:scale-105 
+           z-50
+        "
          >
             Админка
          </Link>
 
          <Routes>
-            <Route path="/" element={<ListPage data={apartments} />} />
-            <Route path="/:id" element={<DetailPage data={apartments} />} />
+            <Route
+               path="/"
+               element={
+                  <ListPage
+                     data={apartments}
+                     updateApartment={updateApartment}
+                  />
+               }
+            />
+            <Route
+               path="/:id"
+               element={
+                  <DetailPage
+                     data={apartments}
+                     updateApartment={updateApartment}
+                  />
+               }
+            />
             <Route path="/admin" element={<AdminPanel />} />
          </Routes>
       </BrowserRouter>
