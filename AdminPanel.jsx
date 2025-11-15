@@ -22,7 +22,7 @@ const DISTRICTS = [
   "Выше Нурлы жол",
 ];
 
-const PAYMENT_OPTIONS = ["Ипотека", "Наличный", "Рассрочка", "Бартер"];
+const PAYMENT_OPTIONS = ["ст.Ипотека", "Отбасы 30/70","Отбасы 50/50","Отсрочка","Рассрочка", "парт. Ипотека", "7-20-25"];
 
 export default function AdminPanel() {
   const [cards, setCards] = useState([]);

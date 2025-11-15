@@ -95,13 +95,14 @@ const DISTRICTS = [
 const CONSTRUCTION_TYPES = ["кирпич", "монолит"];
 const CLASSES = ["стандарт", "комфорт", "комфорт+", "бизнес"];
 const STATES = ["Черновая", "Улучшенная черновая", "Предчистовая", "Чистовая"];
-const PAYMENT_METHODS = [
-   "Ипотека",
+const PAYMENT_OPTIONS = [
+   "ст.Ипотека",
+   "Отбасы 30/70",
+   "Отбасы 50/50",
+   "Отсрочка",
    "Рассрочка",
-   "Наличный",
-   "Бартер",
-   "Маткапитал",
-   "Trade-in",
+   "парт. Ипотека",
+   "7-20-25",
 ];
 
 function useFilters(data) {
@@ -300,7 +301,7 @@ function SidebarFilters({ filters }) {
          <div className="mb-3">
             <div className="font-medium">Способы оплаты</div>
             <div className="flex flex-col mt-1">
-               {PAYMENT_METHODS.map((pm) => (
+               {PAYMENT_OPTIONS.map((pm) => (
                   <label key={pm} className="inline-flex items-center gap-2">
                      <input
                         type="checkbox"
@@ -416,6 +417,7 @@ function DetailPage({ data }) {
          </div>
       );
 
+
    return (
       <div className="p-6">
          <Link to="/" className="text-sm text-blue-600">
@@ -442,7 +444,7 @@ function DetailPage({ data }) {
                   </ul>
                </div>
 
-               <div className="mt-3">Скидка: {item.Скидка}</div>
+               <div className="mt-3">Скидка: {item.скидка}</div>
                <div>Готовность: {item.готов ? "Готов" : "Строится"}</div>
                <div>
                   Срок сдачи:{" "}
