@@ -202,7 +202,6 @@ function SidebarFilters({ filters }) {
    return (
       <aside className="w-80 p-4 border-r h-screen sticky top-0 overflow-auto">
          <h2 className="text-xl font-semibold mb-3">Фильтры</h2>
-         <a href="/admin">Админка</a>
 
          <input
             value={filters.query}
@@ -365,22 +364,96 @@ function SidebarFilters({ filters }) {
    );
 }
 
-function Card({ item }) {
+
+function Card({ item, updateApartment }) {
+   const [editing, setEditing] = useState(false);
+   const [comment, setComment] = useState(item.comment || "");
+
+   const borderColor = item.готов ? "border-green-500" : "border-red-500";
+
+   const handleSave = () => {
+      updateApartment(item.id, { comment });
+      setEditing(false);
+   };
+
    return (
-      <Link
-         to={`/${item.id}`}
-         className="block border rounded p-4 hover:shadow"
-      >
-         <div className="text-lg font-semibold">{item.Название}</div>
-         <div className="text-sm text-gray-600">
-            {item.Класс_жилья} • {item.Район}
-         </div>
-         <div className="mt-2 text-xl font-bold">
-            {(item.Цена ?? 0).toLocaleString()} тг/м²
-         </div>
-      </Link>
+      <div className="relative">
+         <Link
+            to={`/${item.id}`}
+            className={`block border-2 ${borderColor} rounded p-4 hover:shadow-lg transition`}
+         >
+            <div className="text-lg font-semibold">{item.Название}</div>
+            <div className="text-sm text-gray-600">
+               {item.Класс} • {item.Район}
+            </div>
+
+            <div className="mt-2 text-xl font-bold">
+               {(item.Цена ?? 0).toLocaleString()} тг/м²
+            </div>
+
+            <div
+               className={`mt-2 text-sm font-medium ${
+                  item.готов ? "text-green-600" : "text-red-600"
+               }`}
+            >
+               {item.готов ? "Готов" : "Строится"}
+            </div>
+
+            {item.comment && !editing && (
+               <div className="mt-3 text-sm text-gray-700 border-l-4 border-gray-300 pl-2">
+                  💬 {item.comment}
+               </div>
+            )}
+         </Link>
+
+         {/* Кнопка редактирования */}
+         <button
+            onClick={() => setEditing(!editing)}
+            className="
+               absolute top-3 right-3 
+               bg-yellow-400 hover:bg-yellow-500 
+               text-black text-xs px-2 py-1 rounded shadow
+            "
+         >
+            ✏️ Комментарий
+         </button>
+
+         {/* Форма редактирования */}
+         {editing && (
+            <div className="mt-2 bg-white border p-3 rounded shadow">
+               <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full border rounded p-2 text-sm"
+                  rows={3}
+                  placeholder="Введите комментарий..."
+               />
+
+               <div className="mt-2 flex gap-2">
+                  <button
+                     onClick={handleSave}
+                     className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700"
+                  >
+                     Сохранить
+                  </button>
+
+                  <button
+                     onClick={() => {
+                        setEditing(false);
+                        setComment(item.comment || "");
+                     }}
+                     className="bg-gray-300 text-sm px-3 py-1 rounded hover:bg-gray-400"
+                  >
+                     Отмена
+                  </button>
+               </div>
+            </div>
+         )}
+      </div>
    );
 }
+
+
 
 function ListPage({ data }) {
    const filters = useFilters(data);
@@ -416,7 +489,6 @@ function DetailPage({ data }) {
             Объект не найден. <Link to="/">Назад</Link>
          </div>
       );
-
 
    return (
       <div className="p-6">
@@ -485,6 +557,7 @@ function DetailPage({ data }) {
                   </a>
                </div>
             </div>
+            <div>{item.comment}</div>
          </div>
       </div>
    );
@@ -500,6 +573,22 @@ export default function App() {
 
    return (
       <BrowserRouter>
+         {/* твоя кнопка Admin */}
+         <Link
+            to="/admin"
+            className="
+               fixed bottom-6 right-6 
+               bg-blue-600 text-white 
+               px-5 py-3 
+               rounded-full shadow-xl 
+               hover:bg-blue-700 
+               transition transform hover:scale-105 
+               z-50
+            "
+         >
+            Админка
+         </Link>
+
          <Routes>
             <Route path="/" element={<ListPage data={apartments} />} />
             <Route path="/:id" element={<DetailPage data={apartments} />} />
