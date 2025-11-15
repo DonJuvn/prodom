@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";import { db } from "./firebase";
+import React, { useState, useEffect } from "react";
+import { db } from "./firebase";
 import {
    collection,
    addDoc,
@@ -34,6 +35,8 @@ const PAYMENT_OPTIONS = [
 ];
 
 export default function AdminPanel() {
+   const [popup, setPopup] = useState("");
+
    const [cards, setCards] = useState([]);
    const [form, setForm] = useState({
       Название: "",
@@ -79,6 +82,7 @@ export default function AdminPanel() {
 
    const addCard = async (e) => {
       e.preventDefault();
+
       const data = {
          ...form,
          Цена: Number(form.Цена),
@@ -91,6 +95,9 @@ export default function AdminPanel() {
       };
 
       await addDoc(cardsCollection, data);
+
+      setPopup(`${data.Название} добавлен!`);
+      setTimeout(() => setPopup(""), 2000);
 
       setForm({
          Название: "",
@@ -141,6 +148,27 @@ export default function AdminPanel() {
             color: "#222",
          }}
       >
+         {popup && (
+            <div
+               style={{
+                  position: "fixed",
+                  top: "20px",
+                  right: "20px",
+                  background: "#4caf50",
+                  color: "white",
+                  padding: "14px 20px",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  fontSize: "15px",
+                  zIndex: 9999,
+                  opacity: popup ? 1 : 0,
+                  transition: "opacity 0.3s",
+               }}
+            >
+               {popup}
+            </div>
+         )}
+
          <h1 style={{ marginBottom: 20 }}>Admin Panel</h1>
 
          <a href="/" style={{ color: "#007bff" }}>
