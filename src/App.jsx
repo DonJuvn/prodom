@@ -525,7 +525,7 @@ function DetailPage({ data }) {
                <div className="mt-3">
                   <div className="font-medium">Способы оплаты</div>
                   <ul className="list-disc pl-5">
-                     {(item.Способы_оплаты || []).map((p) => (
+                     {(item.Способы || []).map((p) => (
                         <li key={p}>{p}</li>
                      ))}
                   </ul>
@@ -552,6 +552,9 @@ function DetailPage({ data }) {
                <div>Фасад: {item.Фасад}</div>
                <div>Окна: {item.Окна}</div>
                <div>Двор: {item.Двор}</div>
+               <div>Ближайшая_школа: В {item.Ближайшая_школа} метрах</div>
+               <div>Ближайший_садик: В {item.Ближайший_садик} метрах</div>
+               <div>ТРЦ: В {item.ТРЦ} метрах</div>
 
                <div className="mt-3">
                   <a

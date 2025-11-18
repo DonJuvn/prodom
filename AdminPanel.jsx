@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";import { db } from "./firebase";
+import React, { useState, useEffect } from "react";
+import { db } from "./firebase";
 import {
    collection,
    addDoc,
@@ -56,6 +57,9 @@ export default function AdminPanel() {
       скидка: "",
       срок_сдачи: "",
       comment: "",
+      Ближайшая_школа: "", // <-- новое поле
+      Ближайший_садик: "", // <-- новое поле
+      ТРЦ: "",
    });
 
    const cardsCollection = collection(db, "cards");
@@ -123,6 +127,9 @@ export default function AdminPanel() {
             ),
             comment: `Комментарий ${Math.floor(Math.random() * 1000)}`,
             createdAt: Timestamp.now(),
+            Ближайшая_школа: Math.floor(Math.random() * 20) + 5,
+            Ближайший_садик: Math.floor(Math.random() * 20) + 5,
+            ТРЦ: Math.floor(Math.random() * 20) + 5,
          };
 
          await addDoc(cardsCollection, data);
@@ -148,6 +155,9 @@ export default function AdminPanel() {
             ? Timestamp.fromDate(new Date(form.срок_сдачи))
             : null,
          createdAt: Timestamp.now(), // дата добавления
+         Ближайшая_школа: form.Ближайшая_школа,
+         Ближайший_садик: form.Ближайший_садик,
+         ТРЦ: form.ТРЦ,
       };
 
       await addDoc(cardsCollection, data);
@@ -187,6 +197,20 @@ export default function AdminPanel() {
       fetchCards();
    };
 
+   const removeAllCards = async () => {
+
+   const snapshot = await getDocs(cardsCollection);
+   const deletePromises = snapshot.docs.map((docItem) =>
+      deleteDoc(doc(db, "cards", docItem.id))
+   );
+
+   await Promise.all(deletePromises);
+   fetchCards();
+   setPopup("Все карточки удалены!");
+   setTimeout(() => setPopup(""), 3000);
+};
+
+
    // -----------------------------
    // TOGGLE PAYMENT
    const togglePayment = (method) => {
@@ -208,7 +232,6 @@ export default function AdminPanel() {
             color: "#222",
          }}
       >
-         
          <button
             onClick={addRandomCards}
             style={{
@@ -224,6 +247,23 @@ export default function AdminPanel() {
          >
             Добавить 20 случайных карточек
          </button>
+         <button
+   onClick={removeAllCards}
+   style={{
+      marginTop: 20,
+      marginLeft: 10,
+      padding: "12px",
+      background: "#d9534f",
+      border: "none",
+      color: "white",
+      fontSize: 16,
+      borderRadius: 8,
+      cursor: "pointer",
+   }}
+>
+   Удалить все карточки
+</button>
+
 
          {/* POPUP */}
          {popup && (
@@ -402,6 +442,30 @@ export default function AdminPanel() {
                   onChange={(e) =>
                      setForm({ ...form, срок_сдачи: e.target.value })
                   }
+                  style={inputStyle}
+               />
+               <input
+                  placeholder="Ближайшая школа"
+                  value={form.Ближайшая_школа}
+                  onChange={(e) =>
+                     setForm({ ...form, Ближайшая_школа: e.target.value })
+                  }
+                  style={inputStyle}
+               />
+
+               <input
+                  placeholder="Ближайший садик"
+                  value={form.Ближайший_садик}
+                  onChange={(e) =>
+                     setForm({ ...form, Ближайший_садик: e.target.value })
+                  }
+                  style={inputStyle}
+               />
+
+               <input
+                  placeholder="ТРЦ"
+                  value={form.ТРЦ}
+                  onChange={(e) => setForm({ ...form, ТРЦ: e.target.value })}
                   style={inputStyle}
                />
 
