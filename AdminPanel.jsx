@@ -381,7 +381,7 @@ export default function AdminPanel() {
                />
 
                <input
-                  type="number"
+               
                   placeholder="Потолок"
                   value={form.Потолок}
                   onChange={(e) =>
