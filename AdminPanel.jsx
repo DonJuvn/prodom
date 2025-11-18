@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { db } from "./firebase";
+import React, { useState, useEffect } from "react";import { db } from "./firebase";
 import {
    collection,
    addDoc,
@@ -36,7 +35,6 @@ const PAYMENT_OPTIONS = [
 
 export default function AdminPanel() {
    const [popup, setPopup] = useState("");
-
    const [cards, setCards] = useState([]);
    const [form, setForm] = useState({
       Название: "",
@@ -62,24 +60,81 @@ export default function AdminPanel() {
 
    const cardsCollection = collection(db, "cards");
 
+   // -----------------------------
+   // FETCH CARDS
    const fetchCards = async () => {
       const snapshot = await getDocs(cardsCollection);
-      setCards(
-         snapshot.docs.map((doc) => {
+
+      const sorted = snapshot.docs
+         .map((doc) => {
             const data = doc.data();
             return {
                id: doc.id,
                ...data,
                срок_сдачи: data.срок_сдачи ? data.срок_сдачи.toDate() : null,
+               createdAt: data.createdAt
+                  ? data.createdAt.toDate()
+                  : new Date(0),
             };
          })
-      );
+         .sort((a, b) => b.createdAt - a.createdAt); // последние первыми
+
+      setCards(sorted);
    };
 
    useEffect(() => {
       fetchCards();
    }, []);
 
+   // -----------------------------
+   // GENERATE 50 RANDOM CARDS
+   const addRandomCards = async () => {
+      for (let i = 0; i < 50; i++) {
+         const data = {
+            Название: `Проект ${Math.floor(Math.random() * 1000)}`,
+            Район: DISTRICTS[Math.floor(Math.random() * DISTRICTS.length)],
+            Тип_строительства: Math.random() > 0.5 ? "монолит" : "кирпич",
+            Класс: ["стандарт", "комфорт", "комфорт+", "бизнес"][
+               Math.floor(Math.random() * 4)
+            ],
+            Состояние: [
+               "Черновая",
+               "Улучшенная черновая",
+               "Предчистовая",
+               "Чистовая",
+            ][Math.floor(Math.random() * 4)],
+            Этажность: Math.floor(Math.random() * 20) + 5,
+            Потолок: Math.floor(Math.random() * 5) + 2.5,
+            Паркинг: Math.random() > 0.5,
+            Двор: `Двор ${Math.floor(Math.random() * 10)}`,
+            Фасад: `Фасад ${Math.floor(Math.random() * 10)}`,
+            Окна: `Окна ${Math.floor(Math.random() * 10)}`,
+            Коммерция: Math.random() > 0.5,
+            Способы: PAYMENT_OPTIONS.filter(() => Math.random() > 0.7),
+            Цена: Math.floor(Math.random() * 50_000_000) + 5_000_000,
+            Шахматка: "",
+            готов: Math.random() > 0.5,
+            скидка: Math.floor(Math.random() * 30),
+            срок_сдачи: Timestamp.fromDate(
+               new Date(
+                  Date.now() +
+                     Math.floor(Math.random() * 365) * 24 * 60 * 60 * 1000
+               )
+            ),
+            comment: `Комментарий ${Math.floor(Math.random() * 1000)}`,
+            createdAt: Timestamp.now(),
+         };
+
+         await addDoc(cardsCollection, data);
+      }
+
+      fetchCards();
+      setPopup("50 случайных карточек добавлены!");
+      setTimeout(() => setPopup(""), 3000);
+   };
+
+   // -----------------------------
+   // ADD CARD
    const addCard = async (e) => {
       e.preventDefault();
 
@@ -92,6 +147,7 @@ export default function AdminPanel() {
          срок_сдачи: form.срок_сдачи
             ? Timestamp.fromDate(new Date(form.срок_сдачи))
             : null,
+         createdAt: Timestamp.now(), // дата добавления
       };
 
       await addDoc(cardsCollection, data);
@@ -124,11 +180,15 @@ export default function AdminPanel() {
       fetchCards();
    };
 
+   // -----------------------------
+   // DELETE CARD
    const removeCard = async (id) => {
       await deleteDoc(doc(db, "cards", id));
       fetchCards();
    };
 
+   // -----------------------------
+   // TOGGLE PAYMENT
    const togglePayment = (method) => {
       setForm((prev) => ({
          ...prev,
@@ -148,6 +208,24 @@ export default function AdminPanel() {
             color: "#222",
          }}
       >
+         
+         <button
+            onClick={addRandomCards}
+            style={{
+               marginTop: 20,
+               padding: "12px",
+               background: "#ff9800",
+               border: "none",
+               color: "white",
+               fontSize: 16,
+               borderRadius: 8,
+               cursor: "pointer",
+            }}
+         >
+            Добавить 50 случайных карточек
+         </button>
+
+         {/* POPUP */}
          {popup && (
             <div
                style={{
