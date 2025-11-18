@@ -89,7 +89,7 @@ export default function AdminPanel() {
    // -----------------------------
    // GENERATE 50 RANDOM CARDS
    const addRandomCards = async () => {
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 20; i++) {
          const data = {
             Название: `Проект ${Math.floor(Math.random() * 1000)}`,
             Район: DISTRICTS[Math.floor(Math.random() * DISTRICTS.length)],
@@ -129,7 +129,7 @@ export default function AdminPanel() {
       }
 
       fetchCards();
-      setPopup("50 случайных карточек добавлены!");
+      setPopup("20 случайных карточек добавлены!");
       setTimeout(() => setPopup(""), 3000);
    };
 
@@ -222,7 +222,7 @@ export default function AdminPanel() {
                cursor: "pointer",
             }}
          >
-            Добавить 50 случайных карточек
+            Добавить 20 случайных карточек
          </button>
 
          {/* POPUP */}
