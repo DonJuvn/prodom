@@ -35,6 +35,7 @@ const PAYMENT_OPTIONS = [
    "7-20-25",
    "Наурыз",
    "Зеленая отбасы",
+   "Trade in",
 ];
 
 function useFilters(data) {

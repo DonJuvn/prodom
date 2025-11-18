@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { db } from "./firebase";
+import React, { useState, useEffect } from "react";import { db } from "./firebase";
 import {
    collection,
    addDoc,
@@ -32,6 +31,7 @@ const PAYMENT_OPTIONS = [
    "7-20-25",
    "Наурыз",
    "Зеленая отбасы",
+   "Trade in",
 ];
 
 export default function AdminPanel() {
@@ -198,18 +198,16 @@ export default function AdminPanel() {
    };
 
    const removeAllCards = async () => {
+      const snapshot = await getDocs(cardsCollection);
+      const deletePromises = snapshot.docs.map((docItem) =>
+         deleteDoc(doc(db, "cards", docItem.id))
+      );
 
-   const snapshot = await getDocs(cardsCollection);
-   const deletePromises = snapshot.docs.map((docItem) =>
-      deleteDoc(doc(db, "cards", docItem.id))
-   );
-
-   await Promise.all(deletePromises);
-   fetchCards();
-   setPopup("Все карточки удалены!");
-   setTimeout(() => setPopup(""), 3000);
-};
-
+      await Promise.all(deletePromises);
+      fetchCards();
+      setPopup("Все карточки удалены!");
+      setTimeout(() => setPopup(""), 3000);
+   };
 
    // -----------------------------
    // TOGGLE PAYMENT
@@ -248,22 +246,21 @@ export default function AdminPanel() {
             Добавить 20 случайных карточек
          </button>
          <button
-   onClick={removeAllCards}
-   style={{
-      marginTop: 20,
-      marginLeft: 10,
-      padding: "12px",
-      background: "#d9534f",
-      border: "none",
-      color: "white",
-      fontSize: 16,
-      borderRadius: 8,
-      cursor: "pointer",
-   }}
->
-   Удалить все карточки
-</button>
-
+            onClick={removeAllCards}
+            style={{
+               marginTop: 20,
+               marginLeft: 10,
+               padding: "12px",
+               background: "#d9534f",
+               border: "none",
+               color: "white",
+               fontSize: 16,
+               borderRadius: 8,
+               cursor: "pointer",
+            }}
+         >
+            Удалить все карточки
+         </button>
 
          {/* POPUP */}
          {popup && (
@@ -381,7 +378,6 @@ export default function AdminPanel() {
                />
 
                <input
-               
                   placeholder="Потолок"
                   value={form.Потолок}
                   onChange={(e) =>
